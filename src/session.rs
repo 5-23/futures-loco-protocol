@@ -19,7 +19,7 @@ pub struct LocoSession {
 }
 
 impl LocoSession {
-    pub fn new<T>(client: LocoClient<T>) -> (Self, LocoSessionStream<T>) {
+    pub fn new<T: Clone>(client: LocoClient<T>) -> (Self, LocoSessionStream<T>) {
         let (sender, receiver) = flume::bounded(16);
 
         (Self { sender }, LocoSessionStream::new(receiver, client))
@@ -42,7 +42,7 @@ impl LocoSession {
 }
 
 pin_project_lite::pin_project!(
-    pub struct LocoSessionStream<T> {
+    pub struct LocoSessionStream<T: Clone> {
         #[pin]
         request_stream: RecvStream<'static, Request>,
 
@@ -55,7 +55,7 @@ pin_project_lite::pin_project!(
     }
 );
 
-impl<T> LocoSessionStream<T> {
+impl<T: Clone> LocoSessionStream<T> {
     fn new(request_receiver: Receiver<Request>, client: LocoClient<T>) -> Self {
         Self {
             request_stream: request_receiver.into_stream(),
@@ -68,7 +68,7 @@ impl<T> LocoSessionStream<T> {
     }
 }
 
-impl<T: AsyncRead + AsyncWrite> Stream for LocoSessionStream<T> {
+impl<T: AsyncRead + AsyncWrite + Clone> Stream for LocoSessionStream<T> {
     type Item = io::Result<BoxedCommand>;
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {

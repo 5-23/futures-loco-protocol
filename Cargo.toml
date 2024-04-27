@@ -1,7 +1,7 @@
 [package]
 name = "futures-loco-protocol"
-version = "0.4.0"
-authors = ["storycraft <storycraft@pancake.sh>"]
+version = "0.4.1"
+authors = ["storycraft <storycraft@pancake.sh>", "5-23 <rustacean@5-23.dev>"]
 license = "MIT"
 keywords = ["loco", "protocol", "futures"]
 readme = "readme.md"

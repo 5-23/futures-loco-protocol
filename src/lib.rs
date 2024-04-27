@@ -18,8 +18,8 @@ use std::{
 };
 
 pin_project_lite::pin_project!(
-    #[derive(Debug)]
-    pub struct LocoClient<T> {
+    #[derive(Debug, Clone)]
+    pub struct LocoClient<T: Clone> {
         current_id: u32,
 
         sink: LocoSink,
@@ -32,7 +32,7 @@ pin_project_lite::pin_project!(
     }
 );
 
-impl<T> LocoClient<T> {
+impl<T: Clone> LocoClient<T> {
     pub const MAX_READ_SIZE: u64 = 16 * 1024 * 1024;
 
     pub const fn new(inner: T) -> Self {
@@ -65,7 +65,7 @@ impl<T> LocoClient<T> {
     }
 }
 
-impl<T: AsyncRead> LocoClient<T> {
+impl<T: AsyncRead + Clone> LocoClient<T> {
     pub async fn read(&mut self) -> io::Result<BoxedCommand>
     where
         T: Unpin,
@@ -124,7 +124,7 @@ impl<T: AsyncRead> LocoClient<T> {
     }
 }
 
-impl<T: AsyncWrite> LocoClient<T> {
+impl<T: AsyncWrite + Clone> LocoClient<T> {
     pub async fn send(&mut self, method: Method, data: &[u8]) -> io::Result<u32>
     where
         T: Unpin,
@@ -183,7 +183,7 @@ impl<T: AsyncWrite> LocoClient<T> {
     }
 }
 
-impl<T: AsyncRead + AsyncWrite + Unpin> LocoClient<T> {
+impl<T: AsyncRead + AsyncWrite + Unpin + Clone> LocoClient<T> {
     pub async fn request(
         &mut self,
         method: Method,
@@ -209,7 +209,7 @@ impl<T: AsyncRead + AsyncWrite + Unpin> LocoClient<T> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum ReadState {
     Pending,
     PacketTooLarge,
